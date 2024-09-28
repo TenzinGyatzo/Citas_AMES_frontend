@@ -59,6 +59,8 @@ export const useAppointmentsStore = defineStore('appointments', () => {
     // Método para obtener las horas ocupadas de Google Calendar
     async function fetchUnavailableTimes(date) {
         try {
+            appointmentsByDate.value = [];
+
             const isoDate = convertToISO(date);
             const formattedDate = format(new Date(isoDate), 'yyyy-MM-dd');
             const apiUrl = import.meta.env.VITE_API_URL_DOMAIN || 'http://localhost:4000/api';
@@ -71,24 +73,27 @@ export const useAppointmentsStore = defineStore('appointments', () => {
 
             events.forEach(event => {
                 const start = new Date(event.start);
-                const end = new Date(event.end); 
-
-                if (!isNaN(start) && !isNaN(end)) {
+                const end = new Date(event.end);
+    
+                // Asegurarse de que el evento afecte específicamente al día seleccionado
+                const eventStartsOnSelectedDay = start.toDateString() === new Date(isoDate).toDateString();
+                const eventEndsOnSelectedDay = end.toDateString() === new Date(isoDate).toDateString();
+                const eventCrossesSelectedDay = start < new Date(isoDate) && end > new Date(isoDate);
+    
+                // Filtrar solo eventos que impacten el día específico seleccionado
+                if (eventStartsOnSelectedDay || eventEndsOnSelectedDay || eventCrossesSelectedDay) {
                     let currentTime = start;
-                    // Bucle para capturar todos los intervalos de 30 minutos
-                    while (currentTime < end) {
-                         // Elimina el cero a la izquierda en las horas de un solo dígito
+    
+                    // Ajustar para no añadir horas del día anterior si el evento no cruza medianoche
+                    while (currentTime < end && currentTime.toDateString() === new Date(isoDate).toDateString()) {
                         occupiedTimes.push(format(currentTime, 'H:mm'));
-                        // Incrementa en 30 minutos
                         currentTime = new Date(currentTime.getTime() + 30 * 60 * 1000);
                     }
-                } else {
-                    console.error('Evento con fecha inválida o faltante:', event);
                 }
             });
 
             // Actualiza appointmentsByDate.value con las horas ocupadas
-            appointmentsByDate.value.push(...occupiedTimes);
+            appointmentsByDate.value = [...new Set(occupiedTimes)];
             // console.log('Horas ocupadas procesadas:', occupiedTimes);
         } catch (error) {
             console.error('Error al obtener horarios ocupados:', error);
@@ -241,7 +246,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
     
             // Si es sábado, deshabilitar las horas de la tarde
             if (selectedDay === 6) {
-                if (["14:00", "14:30", "15:00", "15:30", "16:00", "16:30"].includes(hour)) {
+                if (["13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"].includes(hour)) {
                     return true;
                 }
             }

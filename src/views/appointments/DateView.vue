@@ -40,7 +40,7 @@ const disableDate = (date) => {
   }
 
   // Deshabilitar si el mes es más de un mes adelante del mes actual
-  if (date.getMonth() > today.getMonth() + 1) {
+  if (date.getMonth() > today.getMonth() + 3) {
     return true;
   }
 
