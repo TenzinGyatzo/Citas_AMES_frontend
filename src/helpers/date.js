@@ -11,9 +11,10 @@ export function displayDate(date) {
 }
 
 export function convertToDDMMYYYY(isoDate) {
-    const newDate = new Date(isoDate)
-    const formattedDate = format(newDate, 'dd/MM/yyyy')
-    return formattedDate
+    // Extrae el año, mes y día del formato ISO
+    const [year, month, day] = isoDate.split('T')[0].split('-');
+    const utcDate = new Date(Date.UTC(year, month - 1, day)); // Usamos Date.UTC para evitar el ajuste de zona horaria
+    return format(utcDate, 'dd/MM/yyyy');
 }
 
 export function convertToDisplayDate(strDate) {
