@@ -243,10 +243,14 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             const parsedDate = parse(date, 'dd/MM/yyyy', new Date());
             // Obtenemos el día de la semana (6 = Sábado)
             const selectedDay = parsedDate.getDay(); 
+
+            if (["13:00", "13:30"].includes(hour)) {
+                return true;
+            }
     
             // Si es sábado, deshabilitar las horas de la tarde
             if (selectedDay === 6) {
-                if (["13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30"].includes(hour)) {
+                if (["14:00", "14:30", "15:00", "15:30", "16:00", "16:30"].includes(hour)) {
                     return true;
                 }
             }
