@@ -100,13 +100,13 @@ export const useAppointmentsStore = defineStore('appointments', () => {
         }
     }
 
-
     function setSelectedAppointment(appointment) {
-        worker.value = appointment.worker
-        services.value = appointment.services
-        date.value = convertToDDMMYYYY(appointment.date)
-        time.value = appointment.time
-        appointmentId.value = appointment._id
+        worker.value = appointment.worker;
+        services.value = appointment.services;
+        date.value = convertToDDMMYYYY(appointment.date);
+        time.value = appointment.time;
+        appointmentId.value = appointment._id;
+    
     }
 
     function setWorkerData(workerData) {
@@ -142,7 +142,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             } catch (error) {
                 console.log(error);
             } finally {
-                loading.value = false; // Restablecer el estado de carga
+                loading.value = false;
             }
         } else { // Creando una nueva cita
             try {
@@ -154,7 +154,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             } catch (error) {
                 console.log(error);
             } finally {
-                loading.value = false; // Restablecer el estado de carga
+                loading.value = false;
             }
         }
 
@@ -223,8 +223,6 @@ export const useAppointmentsStore = defineStore('appointments', () => {
         return date.value ? true : false
     })
 
-    
-
     const disableTime = computed(() => {
         return (hour, date) => {
             // format convierte Date => String
@@ -234,6 +232,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             const formattedHour = hour.padStart(5, '0'); // Convierte "8:00" a "08:00" si es necesario
 
             const now = new Date();
+            now.setHours(0, 0, 0, 0); // Normaliza a medianoche
             const currentHour = format(now, 'HH:mm');
             const currentDate = format(now, 'dd/MM/yyyy'); 
             
@@ -264,8 +263,6 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             return appointmentsByDate.value.includes(hour || formattedHour);
         };
     });
-    
-      
 
     return {
         worker,

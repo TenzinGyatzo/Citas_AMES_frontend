@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import VueTailwindDatepicker from 'vue-tailwind-datepicker'
   import SelectedService from '../../components/SelectedService.vue'
   import { formatCurrency } from '../../helpers'
@@ -34,6 +34,9 @@ const disableDate = (date) => {
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
+  // Normalizar al inicio del día para evitar desfases
+  startOfDate.setHours(0, 0, 0, 0);
+
   // Deshabilitar si la fecha es anterior a hoy
   if (startOfDate < startOfToday) {
     return true;
@@ -57,6 +60,11 @@ const disableDate = (date) => {
 
   return isHoliday;
 };
+
+watch(() => appointments.date, (newDate, oldDate) => {
+    console.log(`appointments.date changed from ${oldDate} to ${newDate}`);
+});
+
 
 </script>
 
