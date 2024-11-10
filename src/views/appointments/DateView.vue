@@ -61,11 +61,6 @@ const disableDate = (date) => {
   return isHoliday;
 };
 
-watch(() => appointments.date, (newDate, oldDate) => {
-    console.log(`appointments.date changed from ${oldDate} to ${newDate}`);
-});
-
-
 </script>
 
 <template>

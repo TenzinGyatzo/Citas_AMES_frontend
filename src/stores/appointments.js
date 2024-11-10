@@ -29,19 +29,22 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             let formattedTime = Math.floor(hour) + ':' + (hour % 1 === 0 ? '00' : '30');
             hours.value.push(formattedTime)
         }
+
     })
 
     watch(date, async () => {
         time.value = '';
         if (date.value === '') return;
       
-        // Obtenemos las citas locales desde AppointmentAPI
         const { data } = await AppointmentAPI.getByDate(date.value);
+        // console.log(`Citas del ${date.value}:`, data);
       
-        if (appointmentId.value) {
-          // Si hay appointmentId, estamos editando
+        if (appointmentId.value) { // Si hay appointmentId, estamos editando
+          // console.log('appointmentId.value:', appointmentId.value);
           appointmentsByDate.value = data.filter(appointment => appointment._id !== appointmentId.value);
+          // console.log('appointmentsByDate.value:', appointmentsByDate.value);
           const currentAppointment = data.find(appointment => appointment._id === appointmentId.value);
+          // console.log('currentAppointment:', currentAppointment);
           if (currentAppointment) {
             time.value = currentAppointment.time;
           }
@@ -53,8 +56,6 @@ export const useAppointmentsStore = defineStore('appointments', () => {
         // Llama a fetchUnavailableTimes para obtener horarios ocupados de Google Calendar
         await fetchUnavailableTimes(date.value);
     });
-
-
 
     // Método para obtener las horas ocupadas de Google Calendar
     async function fetchUnavailableTimes(date) {
@@ -95,6 +96,11 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             // Actualiza appointmentsByDate.value con las horas ocupadas
             appointmentsByDate.value = [...new Set(occupiedTimes)];
             // console.log('Horas ocupadas procesadas:', occupiedTimes);
+                    
+            // Remover el valor que esté en time.value de appointmentsByDate.value
+            if (time.value) {
+                appointmentsByDate.value = appointmentsByDate.value.filter(timeSlot => timeSlot !== time.value);
+            }
         } catch (error) {
             console.error('Error al obtener horarios ocupados:', error);
         }
@@ -106,7 +112,6 @@ export const useAppointmentsStore = defineStore('appointments', () => {
         date.value = convertToDDMMYYYY(appointment.date);
         time.value = appointment.time;
         appointmentId.value = appointment._id;
-    
     }
 
     function setWorkerData(workerData) {
@@ -232,7 +237,6 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             const formattedHour = hour.padStart(5, '0'); // Convierte "8:00" a "08:00" si es necesario
 
             const now = new Date();
-            now.setHours(0, 0, 0, 0); // Normaliza a medianoche
             const currentHour = format(now, 'HH:mm');
             const currentDate = format(now, 'dd/MM/yyyy'); 
             

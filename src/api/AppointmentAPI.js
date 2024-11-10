@@ -5,6 +5,7 @@ export default {
         return api.post('/appointments', data)
     },
     getByDate(date) {
+        // console.log('Fecha del request: ', date);
         return api.get(`/appointments?date=${date}`)
     },
     getUserAppointments(userId) {
