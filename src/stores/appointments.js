@@ -16,6 +16,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
     const appointmentsByDate = ref([])
     const hours = ref([])
     const loading = ref(false)
+    const isLoadingHours = ref(true)
 
     const toast = inject('toast')
     const router = useRouter()
@@ -60,6 +61,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
     // Método para obtener las horas ocupadas de Google Calendar
     async function fetchUnavailableTimes(date) {
         try {
+            isLoadingHours.value = true;
             appointmentsByDate.value = [];
 
             const isoDate = convertToISO(date);
@@ -103,6 +105,8 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             }
         } catch (error) {
             console.error('Error al obtener horarios ocupados:', error);
+        } finally {
+            isLoadingHours.value = false;
         }
     }
 
@@ -275,6 +279,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
         hours,
         time,
         loading,
+        isLoadingHours,
         setSelectedAppointment,
         setWorkerData,
         onServiceSelected,
