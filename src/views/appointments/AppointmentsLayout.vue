@@ -24,7 +24,7 @@
     <h1 class="place-self-center text-3xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-6xl font-black text-white">Citas AMES</h1>
 
     <div class="flex flex-col space-y-3">
-        <div class="flex gap-2 items-center">
+        <div class="flex gap-2 items-center ml-auto">
             <p class="text-white text-right text-xs lg:text-base">{{ user.getUserName }} de {{  user.getCompanyName }}</p>
             <button
                 type="button"

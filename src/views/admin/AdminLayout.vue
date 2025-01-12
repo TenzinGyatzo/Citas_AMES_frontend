@@ -13,7 +13,7 @@
 <template>
     <div class="flex justify-between">
         <div>
-            <h1 class="text-2xl lg:text-6xl font-black text-white">AmesCitas</h1>
+            <h1 class="text-2xl lg:text-6xl font-black text-white">Citas AMES</h1>
             <h2 class="text-xl lg:text-2xl font-black text-white">Panel de Administración</h2>
         </div>
 
