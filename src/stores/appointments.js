@@ -5,6 +5,7 @@ import AppointmentAPI from '../api/AppointmentAPI'
 import { convertToISO, convertToDDMMYYYY } from '../helpers/date'
 import { useUserStore } from './user'
 import { format, parse } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 
 export const useAppointmentsStore = defineStore('appointments', () => {
 
@@ -64,7 +65,9 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             isLoadingHours.value = true;
             appointmentsByDate.value = [];
 
+            // console.log('Input date:', date);
             const isoDate = convertToISO(date);
+            // console.log('Output date:', isoDate);
             const formattedDate = format(new Date(isoDate), 'yyyy-MM-dd');
             const apiUrl = import.meta.env.VITE_API_URL_DOMAIN || 'http://localhost:4000/api';
             const response = await fetch(`${apiUrl}/calendar/events-by-date/${formattedDate}`);
@@ -73,23 +76,26 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             // console.log('Eventos recibidos de Google Calendar:', events);
 
             const occupiedTimes = [];
+            const businessTimeZone = 'America/Hermosillo'; // UTC-07:00
 
             events.forEach(event => {
-                const start = new Date(event.start);
-                const end = new Date(event.end);
+                const start = toZonedTime(new Date(event.start), businessTimeZone);
+                const end = toZonedTime(new Date(event.end), businessTimeZone);
+
+                const selectedDay = toZonedTime(new Date(isoDate), businessTimeZone);
     
                 // Asegurarse de que el evento afecte específicamente al día seleccionado
-                const eventStartsOnSelectedDay = start.toDateString() === new Date(isoDate).toDateString();
-                const eventEndsOnSelectedDay = end.toDateString() === new Date(isoDate).toDateString();
-                const eventCrossesSelectedDay = start < new Date(isoDate) && end > new Date(isoDate);
+                const eventStartsOnSelectedDay = start.toDateString() === selectedDay.toDateString();
+                const eventEndsOnSelectedDay = end.toDateString() === selectedDay.toDateString();
+                const eventCrossesSelectedDay = start < selectedDay && end > selectedDay;
     
                 // Filtrar solo eventos que impacten el día específico seleccionado
                 if (eventStartsOnSelectedDay || eventEndsOnSelectedDay || eventCrossesSelectedDay) {
                     let currentTime = start;
     
                     // Ajustar para no añadir horas del día anterior si el evento no cruza medianoche
-                    while (currentTime < end && currentTime.toDateString() === new Date(isoDate).toDateString()) {
-                        occupiedTimes.push(format(currentTime, 'H:mm'));
+                    while (currentTime < end && currentTime.toDateString() === selectedDay.toDateString()) {
+                        occupiedTimes.push(format(currentTime, 'H:mm', { timeZone: businessTimeZone }));
                         currentTime = new Date(currentTime.getTime() + 30 * 60 * 1000);
                     }
                 }
