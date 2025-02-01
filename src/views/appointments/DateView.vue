@@ -14,10 +14,11 @@ const formatter = ref({
 
 const holidays = [
   { day: 1, month: 0 },   // 1 de enero - Año Nuevo
-  { day: 5, month: 1 },   // 5 de febrero - Día de la Constitución (día original)
+  { day: 3, month: 1 },   // 5 de febrero - Día de la Constitución (día original)
+  { day: 17, month: 2 },   // 17 de marzo (Tercer lunes de marzo) - n conmemoración del 21 de marzo, Natalicio de Benito Juárez
   { day: 1, month: 4 },   // 1 de mayo - Día del Trabajo
   { day: 16, month: 8 },  // 16 de septiembre - Día de la Independencia
-  // { day: 20, month: 10 }, // 20 de noviembre - Día de la Revolución Mexicana (día original)
+  { day: 18, month: 10 }, // 20 de noviembre - Día de la Revolución Mexicana (día original)
   { day: 25, month: 11 }, // 25 de diciembre - Navidad
   { day: 1, month: 11 },  // 1 de diciembre (cada seis años) - Transmisión del Poder Ejecutivo Federal (solo si hay cambio de presidente) **Quitar después que entre la Sheinbaum** 
 

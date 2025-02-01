@@ -27,6 +27,7 @@ export const useUserStore = defineStore('user', () => {
     async function getUserAppointments() {
         const { data } = await AppointmentAPI.getUserAppointments(user.value._id)
         userAppointments.value = data
+        console.log('Citas del usuario: ', userAppointments.value)
     }
     
     const logout = () => {
