@@ -1,4 +1,4 @@
-import { parse, formatISO, parseISO, format, addD } from "date-fns";
+import { parse, parseISO, format } from "date-fns";
 import es from "date-fns/locale/es";
 
 export function convertToISO(strDate) {

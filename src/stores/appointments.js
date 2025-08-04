@@ -19,13 +19,22 @@ export const useAppointmentsStore = defineStore('appointments', () => {
     const loading = ref(false)
     const isLoadingHours = ref(true)
 
+    // Reglas de horas configurables
+    const hourRules = ref({
+        "8:00": 2, "8:30": 2, "9:00": 2, "9:30": 2,
+        "10:00": 2, "10:30": 2, "11:00": 2, "11:30": 2,
+        "12:00": 2, "12:30": 2, "14:00": 1, "14:30": 1,
+        "15:00": 2, "15:30": 2, "16:00": 2, "16:30": 2,
+        "17:00": 1, "17:30": 1
+    });
+
     const toast = inject('toast')
     const router = useRouter()
     const user = useUserStore()
 
     onMounted(() => {
         const startHour = 8;
-        const endHour = 16;
+        const endHour = 17;
         
         for (let hour = startHour; hour <= endHour + 0.5; hour += 0.5) {
             let formattedTime = Math.floor(hour) + ':' + (hour % 1 === 0 ? '00' : '30');
@@ -43,7 +52,8 @@ export const useAppointmentsStore = defineStore('appointments', () => {
       
         if (appointmentId.value) { // Si hay appointmentId, estamos editando
           // console.log('appointmentId.value:', appointmentId.value);
-          appointmentsByDate.value = data.filter(appointment => appointment._id !== appointmentId.value);
+          const filteredAppointments = data.filter(appointment => appointment._id !== appointmentId.value);
+          appointmentsByDate.value = filteredAppointments.map(appointment => appointment.time);
           // console.log('appointmentsByDate.value:', appointmentsByDate.value);
           const currentAppointment = data.find(appointment => appointment._id === appointmentId.value);
           // console.log('currentAppointment:', currentAppointment);
@@ -52,7 +62,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
           }
         } else {
           // Si no hay appointmentId, estamos creando
-          appointmentsByDate.value = data;
+          appointmentsByDate.value = data.map(appointment => appointment.time);
         }
       
         // Llama a fetchUnavailableTimes para obtener horarios ocupados de Google Calendar
@@ -63,22 +73,24 @@ export const useAppointmentsStore = defineStore('appointments', () => {
     async function fetchUnavailableTimes(date) {
         try {
             isLoadingHours.value = true;
+            // Limpiar el array al inicio para evitar acumulación
             appointmentsByDate.value = [];
 
             // console.log('Input date:', date);
             const isoDate = convertToISO(date);
             // console.log('Output date:', isoDate);
             const formattedDate = format(new Date(isoDate), 'yyyy-MM-dd');
-            const apiUrl = import.meta.env.VITE_API_URL_DOMAIN || 'http://localhost:4000/api';
+            // const apiUrl = import.meta.env.VITE_API_URL_DOMAIN || 'http://localhost:4000/api'; // Para producción
+            const apiUrl = 'http://localhost:4000/api'; // Para desarrollo
             const response = await fetch(`${apiUrl}/calendar/events-by-date/${formattedDate}`);
             const events = await response.json();
 
-            // console.log('Eventos recibidos de Google Calendar:', events);
+            console.log('Eventos recibidos de Google Calendar:', events);
 
             const occupiedTimes = [];
             const businessTimeZone = 'America/Hermosillo'; // UTC-07:00
 
-            events.forEach(event => {
+            events.forEach((event, index) => {            
                 const start = toZonedTime(new Date(event.start), businessTimeZone);
                 const end = toZonedTime(new Date(event.end), businessTimeZone);
 
@@ -88,22 +100,25 @@ export const useAppointmentsStore = defineStore('appointments', () => {
                 const eventStartsOnSelectedDay = start.toDateString() === selectedDay.toDateString();
                 const eventEndsOnSelectedDay = end.toDateString() === selectedDay.toDateString();
                 const eventCrossesSelectedDay = start < selectedDay && end > selectedDay;
-    
+        
                 // Filtrar solo eventos que impacten el día específico seleccionado
                 if (eventStartsOnSelectedDay || eventEndsOnSelectedDay || eventCrossesSelectedDay) {
                     let currentTime = start;
     
                     // Ajustar para no añadir horas del día anterior si el evento no cruza medianoche
                     while (currentTime < end && currentTime.toDateString() === selectedDay.toDateString()) {
-                        occupiedTimes.push(format(currentTime, 'H:mm', { timeZone: businessTimeZone }));
+                        const timeSlot = format(currentTime, 'H:mm', { timeZone: businessTimeZone });
+                        occupiedTimes.push(timeSlot);
                         currentTime = new Date(currentTime.getTime() + 30 * 60 * 1000);
                     }
                 }
             });
 
-            // Actualiza appointmentsByDate.value con las horas ocupadas
-            appointmentsByDate.value = [...new Set(occupiedTimes)];
-            // console.log('Horas ocupadas procesadas:', occupiedTimes);
+            // SOLO usar los eventos de Google Calendar, no combinar con citas existentes
+            // Las citas existentes ya están incluidas en los eventos de Google Calendar
+            appointmentsByDate.value = occupiedTimes;
+            
+
                     
             // Remover el valor que esté en time.value de appointmentsByDate.value
             if (time.value) {
@@ -263,7 +278,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
     
             // Si es sábado, deshabilitar las horas de la tarde
             if (selectedDay === 6) {
-                if (["14:00", "14:30", "15:00", "15:30", "16:00", "16:30"].includes(hour)) {
+                if (["14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"].includes(hour)) {
                     return true;
                 }
             }
@@ -272,11 +287,28 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             if (date === currentDate && slotTime < currentTime) {
                 return true;
             }
-    
-            // Deshabilitar si la hora ya está ocupada en las citas
-            return appointmentsByDate.value.includes(hour || formattedHour);
+
+            // Obtener la regla para esta hora específica
+            const maxEventsForHour = hourRules.value[hour] || 1; // Por defecto 1 si no está configurado
+
+            // Contar cuántos eventos hay en esta hora específica
+            const eventsInThisHour = appointmentsByDate.value.filter(timeSlot => timeSlot === hour).length;
+            
+
+            
+            // Deshabilitar si se alcanza el límite de eventos para esta hora
+            return eventsInThisHour >= maxEventsForHour;
         };
     });
+
+    // Funciones para gestionar las reglas de horas
+    function getHourRules() {
+        return { ...hourRules.value };
+    }
+
+    function updateHourRules(newRules) {
+        hourRules.value = { ...newRules };
+    }
 
     return {
         worker,
@@ -298,6 +330,8 @@ export const useAppointmentsStore = defineStore('appointments', () => {
         totalAmount,
         isValidReservation,
         isDateSelected,
-        disableTime
+        disableTime,
+        getHourRules,
+        updateHourRules
     }
 })

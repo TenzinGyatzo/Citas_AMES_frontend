@@ -30,6 +30,27 @@
               </div>
           </div>
     </div>
+    
+    <!-- Navegación del admin -->
+    <nav class="bg-white rounded-lg p-4 shadow-lg mb-6 mt-4">
+      <div class="flex flex-wrap gap-4">
+        <RouterLink 
+          to="/admin" 
+          class="px-4 py-2 rounded-lg font-bold transition-all duration-300"
+          :class="$route.name === 'admin-appointments' ? 'bg-sky-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+        >
+          Citas
+        </RouterLink>
+        <RouterLink 
+          to="/admin/reglas-horarios" 
+          class="px-4 py-2 rounded-lg font-bold transition-all duration-300"
+          :class="$route.name === 'admin-hour-rules' ? 'bg-sky-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+        >
+          Reglas de Horarios
+        </RouterLink>
+      </div>
+    </nav>
+    
     <main class="space-y-6">
        <RouterView />
     </main>

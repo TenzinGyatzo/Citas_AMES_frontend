@@ -21,6 +21,11 @@ const router = createRouter({
           path: '',
           name: 'admin-appointments',
           component: () => import('../views/admin/AppointmentsView.vue'),
+        },
+        {
+          path: 'reglas-horarios',
+          name: 'admin-hour-rules',
+          component: () => import('../views/admin/HourRulesView.vue'),
         }
       ]
     },
