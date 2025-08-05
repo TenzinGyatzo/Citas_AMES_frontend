@@ -2,6 +2,7 @@ import { ref, computed, onMounted, inject, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { useRouter } from 'vue-router'
 import AppointmentAPI from '../api/AppointmentAPI'
+import { HourRulesAPI } from '../api/HourRulesAPI'
 import { convertToISO, convertToDDMMYYYY } from '../helpers/date'
 import { useUserStore } from './user'
 import { format, parse } from 'date-fns';
@@ -32,7 +33,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
     const router = useRouter()
     const user = useUserStore()
 
-    onMounted(() => {
+    onMounted(async () => {
         const startHour = 8;
         const endHour = 17;
         
@@ -41,6 +42,8 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             hours.value.push(formattedTime)
         }
 
+        // Cargar reglas de horarios desde la base de datos
+        await loadHourRules();
     })
 
     watch(date, async () => {
@@ -80,8 +83,8 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             const isoDate = convertToISO(date);
             // console.log('Output date:', isoDate);
             const formattedDate = format(new Date(isoDate), 'yyyy-MM-dd');
-            // const apiUrl = import.meta.env.VITE_API_URL_DOMAIN || 'http://localhost:4000/api'; // Para producción
-            const apiUrl = 'http://localhost:4000/api'; // Para desarrollo
+            const apiUrl = import.meta.env.VITE_API_URL_DOMAIN || 'http://localhost:4000/api'; // Para producción
+            // const apiUrl = 'http://localhost:4000/api'; // Para desarrollo
             const response = await fetch(`${apiUrl}/calendar/events-by-date/${formattedDate}`);
             const events = await response.json();
 
@@ -305,12 +308,33 @@ export const useAppointmentsStore = defineStore('appointments', () => {
     });
 
     // Funciones para gestionar las reglas de horas
+    async function loadHourRules() {
+        try {
+            const response = await HourRulesAPI.getCurrentRules();
+            if (response.success) {
+                hourRules.value = response.data;
+            }
+        } catch (error) {
+            console.error('Error al cargar reglas de horarios:', error);
+            // Mantener reglas por defecto si hay error
+        }
+    }
+
     function getHourRules() {
         return { ...hourRules.value };
     }
 
-    function updateHourRules(newRules) {
-        hourRules.value = { ...newRules };
+    async function updateHourRules(newRules) {
+        try {
+            const response = await HourRulesAPI.updateRules(newRules);
+            if (response.success) {
+                hourRules.value = response.data;
+                return { success: true, message: response.message };
+            }
+        } catch (error) {
+            console.error('Error al actualizar reglas de horarios:', error);
+            return { success: false, message: error.response?.data?.message || 'Error al actualizar reglas' };
+        }
     }
 
     return {
@@ -335,6 +359,7 @@ export const useAppointmentsStore = defineStore('appointments', () => {
         isDateSelected,
         disableTime,
         getHourRules,
-        updateHourRules
+        updateHourRules,
+        loadHourRules
     }
 })

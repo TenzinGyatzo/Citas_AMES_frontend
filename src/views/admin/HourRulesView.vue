@@ -23,9 +23,18 @@ onMounted(() => {
   loadCurrentRules()
 })
 
-function loadCurrentRules() {
-  // Obtener las reglas actuales del store
-  hourRules.value = { ...appointments.getHourRules() }
+async function loadCurrentRules() {
+  try {
+    loading.value = true
+    // Cargar las reglas desde la base de datos
+    await appointments.loadHourRules()
+    hourRules.value = { ...appointments.getHourRules() }
+  } catch (error) {
+    message.value = 'Error al cargar las reglas'
+    messageType.value = 'error'
+  } finally {
+    loading.value = false
+  }
 }
 
 async function saveRules() {
@@ -46,11 +55,16 @@ async function saveRules() {
       return
     }
 
-    // Actualizar las reglas en el store
-    appointments.updateHourRules(hourRules.value)
+    // Actualizar las reglas en la base de datos
+    const result = await appointments.updateHourRules(hourRules.value)
     
-    message.value = 'Reglas actualizadas correctamente'
-    messageType.value = 'success'
+    if (result.success) {
+      message.value = result.message || 'Reglas actualizadas correctamente'
+      messageType.value = 'success'
+    } else {
+      message.value = result.message || 'Error al actualizar las reglas'
+      messageType.value = 'error'
+    }
     
     // Limpiar mensaje después de 3 segundos
     setTimeout(() => {
