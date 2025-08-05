@@ -32,7 +32,7 @@
     </div>
     
     <!-- Navegación del admin -->
-    <nav class="bg-white rounded-lg p-4 shadow-lg mb-6 mt-4">
+    <nav class="bg-white rounded-lg p-4 shadow-lg my-4">
       <div class="flex flex-wrap gap-4">
         <RouterLink 
           to="/admin" 

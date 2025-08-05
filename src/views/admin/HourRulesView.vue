@@ -129,60 +129,46 @@ function setTwoDoctors() {
        </ul>
      </div> -->
 
-           <!-- Acciones Rápidas -->
-      <div class="bg-gradient-to-br from-sky-50 to-blue-100 border-2 border-sky-200 p-6 rounded-xl shadow-lg">
-        <div class="text-center mb-2">
-          <h3 class="text-2xl font-extrabold text-sky-800">⚡ Acciones Rápidas</h3>
-          <p class="text-sky-600 text-sm">Configuración instantánea según disponibilidad de médicos</p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- UN MÉDICO -->
-          <div class="group">
-            <button
-              @click="setOneDoctor"
-              class="w-full bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-2 px-6 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-orange-400 hover:border-orange-500"
-            >
-              <div class="flex flex-col items-center space-y-2">
-                <div class="text-xl font-black">👨‍⚕️ UN MÉDICO</div>
-                <div class="text-xs opacity-90 bg-orange-700 bg-opacity-30 px-2 py-1 rounded-full">
-                  Todo en 1, 17:00-17:30 en 0
-                </div>
-              </div>
-            </button>
-          </div>
-          
-          <!-- DOS MÉDICOS -->
-          <div class="group">
-            <button
-              @click="setTwoDoctors"
-              class="w-full bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-2 px-6 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-purple-400 hover:border-purple-500"
-            >
-              <div class="flex flex-col items-center space-y-2">
-                <div class="text-xl font-black">👨‍⚕️👩‍⚕️ DOS MÉDICOS</div>
-                <div class="text-xs opacity-90 bg-purple-700 bg-opacity-30 px-2 py-1 rounded-full">
-                  14:00-14:30 y 17:00-17:30 en 1, resto en 2
-                </div>
-              </div>
-            </button>
-          </div>
-          
-          <!-- DESACTIVAR -->
-          <div class="group">
-            <button
-              @click="deactivateAppointments"
-              class="w-full bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-6 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-red-400 hover:border-red-500"
-            >
-              <div class="flex flex-col items-center space-y-2">
-                <div class="text-xl font-black">🚫 DESACTIVAR</div>
-                <div class="text-xs opacity-90 bg-red-700 bg-opacity-30 px-2 py-1 rounded-full">
-                  Todas las citas se deshabilitarán
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>        
-      </div>
+     <!-- Acciones Rápidas -->
+     <div class="bg-gradient-to-r from-sky-50 to-blue-50 border-2 border-sky-200 p-6 rounded-xl shadow-lg">
+       <div class="flex items-center mb-1 justify-center">
+         <h3 class="text-sky-800 font-bold text-xl text-center">⚡ Acciones Rápidas</h3>
+       </div>
+       
+       <p class="text-sky-700 text-sm mb-2 text-center">Configuración automática según la disponibilidad de médicos</p>
+       
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+         <button
+           @click="setOneDoctor"
+           class="group bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 px-4 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-orange-400 hover:border-orange-500"
+         >
+           <div class="flex items-center justify-center mb-2">
+             <span class="text-lg font-bold">👩‍⚕️ UN MÉDICO</span>
+           </div>
+           <div class="text-xs opacity-90">Todo en 1, 17:00-17:30 en 0</div>
+         </button>
+         
+         <button
+           @click="setTwoDoctors"
+           class="group bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-4 px-4 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-purple-400 hover:border-purple-500"
+         >
+           <div class="flex items-center justify-center mb-2">
+             <span class="text-lg font-bold">👨‍⚕️👩‍⚕️ DOS MÉDICOS</span>
+           </div>
+           <div class="text-xs opacity-90">14:00-14:30 y 17:00-17:30 en 1, resto en 2</div>
+         </button>
+         
+         <button
+           @click="deactivateAppointments"
+           class="group bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-4 px-4 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl border-2 border-red-400 hover:border-red-500"
+         >
+           <div class="flex items-center justify-center mb-2">
+             <span class="text-lg font-bold">DESACTIVAR CITAS</span>
+           </div>
+           <div class="text-xs opacity-90">Todas las citas se deshabilitarán</div>
+         </button>
+       </div>
+     </div>
 
     <!-- Configuración de reglas -->
     <div class="bg-white rounded-lg p-6 shadow-lg">

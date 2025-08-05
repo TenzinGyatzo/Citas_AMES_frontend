@@ -289,12 +289,15 @@ export const useAppointmentsStore = defineStore('appointments', () => {
             }
 
             // Obtener la regla para esta hora específica
-            const maxEventsForHour = hourRules.value[hour] || 1; // Por defecto 1 si no está configurado
+            const maxEventsForHour = hourRules.value[hour] !== undefined ? hourRules.value[hour] : 1; // Por defecto 1 si no está configurado
+
+            // Si el límite es 0, siempre deshabilitar
+            if (maxEventsForHour === 0) {
+                return true;
+            }
 
             // Contar cuántos eventos hay en esta hora específica
             const eventsInThisHour = appointmentsByDate.value.filter(timeSlot => timeSlot === hour).length;
-            
-
             
             // Deshabilitar si se alcanza el límite de eventos para esta hora
             return eventsInThisHour >= maxEventsForHour;
